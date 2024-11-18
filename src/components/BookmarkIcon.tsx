@@ -1,9 +1,23 @@
-import { BookmarkFilledIcon } from "@radix-ui/react-icons";
+import { BookmarkFilledIcon } from '@radix-ui/react-icons';
 
-export default function BookmarkIcon() {
+type BookmarkIconProps = {
+  id: number;
+};
+
+export default function BookmarkIcon({ id }: BookmarkIconProps) {
   return (
-    <button className="bookmark-btn">
-      <BookmarkFilledIcon className="filled" />
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      className='bookmark-btn'
+    >
+      <BookmarkFilledIcon
+        className={`
+        ${false ? 'filled' : ''}
+      `}
+      />
     </button>
   );
 }
