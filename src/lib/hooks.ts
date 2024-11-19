@@ -88,3 +88,27 @@ export const fetchJobItem = async (id: number): Promise<JobItemApiResponse> => {
   const data = await response.json();
   return data;
 };
+
+export const useJobItem = (activeId: number | null) => {
+  const [jobItem, setJobItem] = useState<JobItemExpanded | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchJobItemData = async () => {
+    if (!activeId) return;
+    try {
+      setIsLoading(true);
+      const { jobItem } = await fetchJobItem(activeId);
+      setJobItem(jobItem);
+    } catch (error) {
+      console.error('Error fetching job item data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobItemData();
+  }, [activeId]);
+
+  return { jobItem, isLoading };
+};

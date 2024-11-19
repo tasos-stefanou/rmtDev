@@ -16,7 +16,7 @@ export function JobList({ jobItems, isLoading }: JobListProps) {
           <JobListItem key={jobItem.id} jobItem={jobItem} isActive={false} />
         ))
       ) : (
-        <li className='job-list'>No results found</li>
+        <li></li>
       )}
     </ul>
   );

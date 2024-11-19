@@ -1,39 +1,19 @@
-import { useEffect, useState } from 'react';
-import { fetchJobItem, useActiveId } from '../lib/hooks';
-import { JobItemExpanded } from '../lib/types';
+import { useActiveId, useJobItem } from '../lib/hooks';
 import BookmarkIcon from './BookmarkIcon';
 import Spinner from './Spinner';
 
 export default function JobItemContent() {
   const { activeId } = useActiveId();
-  const [jobItem, setJobItem] = useState<JobItemExpanded | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { jobItem, isLoading } = useJobItem(activeId);
 
-  const fetchJobItemData = async () => {
-    if (!activeId) return;
-
-    try {
-      setIsLoading(true);
-      const { jobItem } = await fetchJobItem(activeId);
-      setJobItem(jobItem);
-    } catch (error) {
-      console.error('Error fetching job item data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchJobItemData();
-  }, [activeId]);
+  if (!jobItem) {
+    return <EmptyJobContent />;
+  }
 
   if (isLoading) {
     return <LoadingJobContent />;
   }
 
-  if (!jobItem) {
-    return <EmptyJobContent />;
-  }
   return (
     <section className='job-details'>
       <div>
