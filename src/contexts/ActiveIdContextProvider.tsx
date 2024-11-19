@@ -1,5 +1,5 @@
-import { createContext } from "react";
-import { useActiveId } from "../lib/hooks";
+import { createContext } from 'react';
+import { useActiveId } from '../lib/hooks';
 
 type ActiveIdContext = {
   activeId: number | null;
@@ -15,11 +15,7 @@ export default function ActiveIdContextProvider({
   const activeId = useActiveId();
 
   return (
-    <ActiveIdContext.Provider
-      value={{
-        activeId,
-      }}
-    >
+    <ActiveIdContext.Provider value={activeId}>
       {children}
     </ActiveIdContext.Provider>
   );
