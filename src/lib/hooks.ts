@@ -32,7 +32,9 @@ export function useJobItems(searchText: string) {
   const getData = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`${BASE_API_URL}?search=${searchText}`);
+      const res = await fetch(
+        `${BASE_API_URL}${searchText ? '?search=' + searchText : ''}`
+      );
       const data = await res.json();
       setJobItems(data.jobItems);
     } catch (error) {
@@ -45,7 +47,7 @@ export function useJobItems(searchText: string) {
   const jobItemsSliced = jobItems.slice(0, RESULTS_PER_PAGE);
 
   useEffect(() => {
-    if (!searchText) return;
+    // if (!searchText) return;
     getData();
   }, [searchText]);
 
