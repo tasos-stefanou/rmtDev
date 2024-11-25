@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { SearchTextContext } from '../contexts/SearchTextContextProvider';
 import { JobItem, JobItemExpanded } from './types';
 import { BASE_API_URL, RESULTS_PER_PAGE } from './constants';
+import { useQuery } from '@tanstack/react-query';
 
 export function useDebounce<T>(value: T, delay = 500): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -94,25 +95,22 @@ export const fetchJobItem = async (id: number): Promise<JobItemApiResponse> => {
 };
 
 export const useJobItem = (activeId: number | null) => {
-  const [jobItem, setJobItem] = useState<JobItemExpanded | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchJobItemData = async () => {
-    if (!activeId) return;
-    try {
-      setIsLoading(true);
-      const { jobItem } = await fetchJobItem(activeId);
-      setJobItem(jobItem);
-    } catch (error) {
-      console.error('Error fetching job item data:', error);
-    } finally {
-      setIsLoading(false);
+  const { data, isInitialLoading } = useQuery(
+    ['job-item', activeId],
+    () => (activeId ? fetchJobItem(activeId) : null),
+    {
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: Boolean(activeId),
+      onError: (error) => {
+        console.error('Error fetching job item:', error);
+      },
     }
-  };
+  );
 
-  useEffect(() => {
-    fetchJobItemData();
-  }, [activeId]);
-
-  return { jobItem, isLoading };
+  return {
+    jobItem: data?.jobItem,
+    isLoading: isInitialLoading,
+  } as const;
 };

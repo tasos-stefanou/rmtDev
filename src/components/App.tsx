@@ -8,9 +8,11 @@ import Sidebar from './Sidebar';
 import { useJobItems, useSearchTextContext } from '../lib/hooks';
 
 function App() {
-  const { searchText, handleChangeSearchText } = useSearchTextContext();
+  const { searchText, debouncedSearchText, handleChangeSearchText } =
+    useSearchTextContext();
 
-  const { jobItems, isLoading, totalNumberOfResults } = useJobItems(searchText);
+  const { jobItems, isLoading, totalNumberOfResults } =
+    useJobItems(debouncedSearchText);
 
   return (
     <>
