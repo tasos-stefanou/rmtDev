@@ -10,7 +10,7 @@ import { useJobItems, useSearchTextContext } from '../lib/hooks';
 function App() {
   const { searchText, handleChangeSearchText } = useSearchTextContext();
 
-  const { jobItems, isLoading } = useJobItems(searchText);
+  const { jobItems, isLoading, totalNumberOfResults } = useJobItems(searchText);
 
   return (
     <>
@@ -22,7 +22,11 @@ function App() {
         />
       </Header>
       <Container>
-        <Sidebar jobItems={jobItems} isLoading={isLoading} />
+        <Sidebar
+          jobItems={jobItems}
+          isLoading={isLoading}
+          totalNumberOfResults={totalNumberOfResults}
+        />
         <JobItemContent />
       </Container>
       <Footer />

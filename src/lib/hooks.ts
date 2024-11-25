@@ -51,7 +51,9 @@ export function useJobItems(searchText: string) {
     getData();
   }, [searchText]);
 
-  return { jobItems: jobItemsSliced, isLoading };
+  const totalNumberOfResults = jobItems.length;
+
+  return { jobItems: jobItemsSliced, isLoading, totalNumberOfResults };
 }
 
 export function useActiveId() {

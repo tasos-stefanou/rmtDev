@@ -7,13 +7,18 @@ import SortingControls from './SortingControls';
 type SidebarProps = {
   jobItems: JobItem[];
   isLoading: boolean;
+  totalNumberOfResults: number;
 };
 
-export default function Sidebar({ jobItems, isLoading }: SidebarProps) {
+export default function Sidebar({
+  jobItems,
+  isLoading,
+  totalNumberOfResults,
+}: SidebarProps) {
   return (
     <div className='sidebar'>
       <div className='sidebar__top'>
-        <ResultsCount />
+        <ResultsCount count={totalNumberOfResults} />
         <SortingControls />
       </div>
       <JobList jobItems={jobItems} isLoading={isLoading} />
