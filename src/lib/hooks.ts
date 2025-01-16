@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { SearchTextContext } from '../contexts/SearchTextContextProvider';
 import { JobItem, JobItemExpanded } from './types';
-import { BASE_API_URL, RESULTS_PER_PAGE } from './constants';
+import { BASE_API_URL } from './constants';
 import { useQuery } from '@tanstack/react-query';
 
 export function useDebounce<T>(value: T, delay = 500): T {
@@ -26,35 +26,51 @@ export function useSearchTextContext() {
   return context;
 }
 
+type JobItemsApiResponse = {
+  public: boolean;
+  sorted: boolean;
+  jobItems: JobItem[];
+};
+
+const fetchJobItems = async (
+  searchText: string
+): Promise<JobItemsApiResponse> => {
+  const response = await fetch(
+    `${BASE_API_URL}${searchText ? '?search=' + searchText : ''}`
+  );
+  // 4xx or 5xx
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.description);
+  }
+
+  const data = await response.json();
+  return data;
+};
+
 export function useJobItems(searchText: string) {
-  const [jobItems, setJobItems] = useState<JobItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const getData = async () => {
-    try {
-      setIsLoading(true);
-      const res = await fetch(
-        `${BASE_API_URL}${searchText ? '?search=' + searchText : ''}`
-      );
-      const data = await res.json();
-      setJobItems(data.jobItems);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setIsLoading(false);
+  const { data, isInitialLoading } = useQuery(
+    ['job-items', searchText],
+    () => fetchJobItems(searchText),
+    {
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      // It is enabled true so it will fetch the data when the component mounts
+      enabled: true,
+      onError: (error) => {
+        console.error(
+          `Error fetching job items based on search text ${searchText}:`,
+          error
+        );
+      },
     }
-  };
+  );
 
-  const jobItemsSliced = jobItems.slice(0, RESULTS_PER_PAGE);
-
-  useEffect(() => {
-    // if (!searchText) return;
-    getData();
-  }, [searchText]);
-
-  const totalNumberOfResults = jobItems.length;
-
-  return { jobItems: jobItemsSliced, isLoading, totalNumberOfResults };
+  return {
+    jobItems: data?.jobItems ?? [],
+    isLoading: isInitialLoading,
+  } as const;
 }
 
 export function useActiveId() {
